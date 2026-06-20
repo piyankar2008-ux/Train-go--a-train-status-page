@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Train Coach Layout</title>
+  <style>
+    body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#topBar {
+  height: 50px;
+  background: #333;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+#mainContainer {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 50px); /* subtract top bar height */
+}
+
+    #leftPanel {
+      width: 50%;
+      position: relative;
+      background: #f0f0f0;
+      overflow: hidden;
+    }
+
+    #rightPanel {
+      width: 50%;
+      padding: 10px;
+      box-sizing: border-box;
+      background: #ddd;
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      overflow-y: auto;
+    }
+
+    #inputSection input {
+  padding: 19px;
+  font-size: 16px;
+  width: 100%;
+  gap: 10px
+  box-sizing: border-box;
+}
+
+    #scrollableArea {
+      position: relative;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .trainWrapper {
+      position: absolute;
+      left: 70%;
+      transform: translateX(-50%);
+      transition: top 1.5s ease-in-out;
+    }
+
+    .train {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 200px;
+    }
+
+    .coach {
+      width: 100px;
+      text-align: center;
+      margin: 5px 0;
+      position: relative;
+    }
+
+    .coach img {
+      width: 100px;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    .coachCodeLabel {
+      position: absolute;
+      top: 8px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+      pointer-events: none;
+    }
+
+    button {
+      padding: 20px;
+      width: 500px;
+      background: #2c7;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1a5;
+    }
+
+    #platformImage {
+      position: absolute;
+      left: 10px;
+      top: 0;
+      height: 3000px;
+      width: 250px;
+      z-index: 1;
+    }
+
+    #trackImage {
+      position: absolute;
+      left: 117px;
+      top: 0;
+      height: 2100px;
+      width: 450px;
+      z-index: 0;
+    }
+    .topbar {
+  position: relative;
+  background: linear-gradient(90deg, #004e92, #000428);
+  color: white;
+  padding: 15px 10px 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.title-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.moto {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  margin-top: 2px;
+  opacity: 0.8;
+  color: #d0d0ff;
+}
+
+.menu-container {
+  position: absolute;
+  left: 10px;
+  top: 18px;
+}
+
+.dots {
+  font-size: 100px;
+  cursor: pointer;
+  color: white;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background: white;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.dropdown div {
+  padding: 50px 100px;
+  cursor: pointer;
+  
+}
+
+.dropdown div:hover {
+  background-color: #f0f0f0;
+}
+.warning{
+background-color :red;
+color: white;
+}
+  </style>
+</head>
+<body>
+
+ <body>
+  <div class="topbar">
+  <div class="menu-container">
+    <div class="dots" onclick="toggleMenu()">&#8942;</div>
+    <div class="dropdown" id="menu">
+     
+     <a href="pnr.html"><div>pnr status</div></a>
+      <a href="between.html"><div>train between</div></a>
+      <a href="coach.html"><div> Coach Layout</div></a>
+       <a href="trainstatus.html"><div> Train status</div></a>
+       <a href="availiblity.html">
+         <div> Seat Availibility</div>
+       </a>
+       <div>Settings</div>
+ <div>Help</div>
+ <div>About</div>
+    </div>
+  </div>
+  
+  
+  <div class="title-box">
+    
+    
+    <div class="title"><h1>TrainMate</h1></div>
+     <img src="Designer.jpeg" width="150px" height="150px">
+    <div class="moto"><h2>Your true mate of journey</h2></div>
+  </div>
+</div>
+<div  align="center" class="warning"><h2>     Warning! Coach position may not be accurate  for some train.Please check coach postion on coresponding stations.</h2></div>
+  <div id="mainContainer">
+    <div id="leftPanel">
+      <img id="platformImage" src="platform.png" alt="Platform" />
+      <img id="trackImage" src="track.png" alt="track" />
+      <div id="scrollableArea"></div>
+    </div>
+
+    <div id="rightPanel">
+      <div id="inputSection">
+        <input id="trainInput" type="text" placeholder="Train Number" />
+        <div id="stationInput"></div>
+        <button onclick="loadAndAnimateTrain()">Load Train</button>
+      </div>
+
+      <h3>Coach Order</h3>
+      <ul id="coachCodes"></ul>
+
+      <h3>Train Info</h3>
+      <div id="trainInfo" style="font-size: 14px;"></div>
+    </div>
+  </div>
+</body>
+
+  <script>
+  function toggleMenu() {
+  const menu = document.getElementById("menu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// Close menu on outside click
+document.addEventListener("click", function(event) {
+  const menu = document.getElementById("menu");
+  const dots = document.querySelector(".dots");
+  
+  if (
+    menu.style.display === "block" &&
+    !menu.contains(event.target) &&
+    !dots.contains(event.target)
+  ) {
+    menu.style.display = "none";
+  }
+});
+    let currentTrainWrapper = null;
+
+    async function fetchTrain(train, station) {
+  const url = `http://localhost:8080/coach.php?trainNo=${train}`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    // Wrap in expected structure
+    return {
+      response: {
+        trainName: data.trainName,
+        trainNumber: data.trainNumber,
+        source: data.source,
+        destination: data.destination,
+        rakeType: "Unknown", // You can add this if available
+        rakeSharing: false, // Same
+        rakeSharingTrains: [],
+        reversalStations: [],
+        reversalPoints: [],
+        coachPosition: data.coachPosition.map(code => ({ coachCode: code }))
+      }
+    };
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+    function createTrainElement(coachArray) {
+      const trainDiv = document.createElement("div");
+      trainDiv.className = "train";
+
+      coachArray.forEach((code, index) => {
+        const coachDiv = document.createElement("div");
+        coachDiv.className = "coach";
+
+        const coachImg = document.createElement("img");
+        const label = document.createElement("div");
+        label.className = "coachCodeLabel";
+        label.textContent = code;
+
+        if (index === 0) {
+          coachImg.src = "front.png";
+        } else if (index === coachArray.length - 1) {
+          coachImg.src = "end.png";
+        } else {
+          coachImg.src = "middle.png";
+        }
+
+        coachDiv.appendChild(coachImg);
+        coachDiv.appendChild(label);
+        trainDiv.appendChild(coachDiv);
+      });
+
+      return trainDiv;
+    }
+
+    async function loadAndAnimateTrain() {
+      const train = document.getElementById("trainInput").value;
+      const station = document.getElementById("stationInput").value;
+      const data = await fetchTrain(train, station);
+
+      const infoDiv = document.getElementById("trainInfo");
+      const listEl = document.getElementById("coachCodes");
+      listEl.innerHTML = "";
+      infoDiv.innerHTML = "";
+
+      if (!data || !data.response || !data.response.coachPosition) {
+        infoDiv.innerHTML = "<span style='color:red;'>No layout available or invalid train number.</span>";
+        return;
+      }
+
+      const coachArray = data.response.coachPosition.map(coach => coach.coachCode);
+
+      coachArray.forEach(code => {
+        const li = document.createElement("li");
+        li.textContent = code;
+        listEl.appendChild(li);
+      });
+
+      // Show train details
+      const info = data.response;
+      infoDiv.innerHTML = `
+  <b>Train Name:</b> ${info.trainName}<br>
+  <b>Train Number:</b> ${info.trainNumber}<br>
+  <b>From:</b> ${info.source}<br>
+  <b>To:</b> ${info.destination}<br>
+  <b>Rake Type:</b> ${info.rakeType}<br>
+  <b>Rake Sharing:</b> ${info.rakeSharing ? "Yes" : "No"}<br>
+  <b>Sharing With:</b> ${info.rakeSharingTrains?.join(", ") || ""}<br>
+  <b>Reversal Stations:</b> ${info.reversalStations?.join(", ") || ""}<br>
+  <b>Reversal Points:</b> ${info.reversalPoints?.join(", ") || ""}<br>
+`;
+
+      const scrollArea = document.getElementById("scrollableArea");
+
+      // Animate old train
+      if (currentTrainWrapper) {
+        const trainHeight = currentTrainWrapper.offsetHeight;
+        currentTrainWrapper.style.transition = "top 1.5s ease";
+        currentTrainWrapper.style.top = `-${trainHeight + 100}px`;
+
+        await new Promise(res => setTimeout(res, 1600));
+        currentTrainWrapper.remove();
+        currentTrainWrapper = null;
+      }
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "trainWrapper";
+      wrapper.style.top = "120%";
+
+      const trainDiv = createTrainElement(coachArray);
+      wrapper.appendChild(trainDiv);
+      scrollArea.appendChild(wrapper);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          wrapper.style.transition = "top 1.5s ease";
+          wrapper.style.top = "0";
+        });
+      });
+
+      currentTrainWrapper = wrapper;
+    }
+  </script>
+
+</body>
+</html>

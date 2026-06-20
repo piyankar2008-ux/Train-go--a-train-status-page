@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Train Tracker with Live Location</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Gesture Handling CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-gesture-handling/dist/leaflet-gesture-handling.min.css" />
+
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #map { height: 90vh; }
+    #controls {
+      padding: 10px;
+      background: #f0f0f0;
+    }
+    input, button, select {
+      padding: 5px;
+      margin: 5px;
+    }
+    .topbar {
+  position: relative;
+  background: linear-gradient(90deg, #004e92, #000428);
+  color: white;
+  padding: 15px 10px 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.title-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.moto {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  margin-top: 2px;
+  opacity: 0.8;
+  color: #d0d0ff;
+}
+
+.menu-container {
+  position: absolute;
+  left: 10px;
+  top: 18px;
+}
+
+.dots {
+  font-size: 70px;
+  cursor: pointer;
+  color: white;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background: white;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.dropdown div {
+  padding: 50px 100px;
+  cursor: pointer;
+  
+}
+
+.dropdown div:hover {
+  background-color: #f0f0f0;
+}
+  </style>
+</head>
+<body>
+ <div class="topbar">
+  <div class="menu-container">
+    <div class="dots" onclick="toggleMenu()">&#8942;</div>
+    <div class="dropdown" id="menu">
+     
+     <a href="pnr.html"><div>pnr status</div></a>
+      <a href="between.html"><div>train between</div></a>
+      <a href="coach.html"><div> Coach Layout</div></a>
+       <a href="trainstatus.html"><div> Train status</div></a>
+       <a href="availiblity.html">
+         <div> Seat Availibility</div>
+       </a>
+       <div>Settings</div>
+ <div>Help</div>
+ <div>About</div>
+    </div>
+  </div>
+  
+  
+  <div class="title-box">
+    <img src="Designer.jpeg" width="150px" height="150px">
+    
+    <div class="title"><h1>TrainMate</h1></div>
+    <div class="moto">Your true mate of journey</div>
+  </div>
+</div>
+<div id="controls">
+  <input type="text" id="trainNo" placeholder="Enter Train Number" />
+  <input type="date" id="doj" />
+  <button onclick="fetchAndPlot()">Track Train</button>
+  <button onclick="enableLiveLocation()">Show My Live Location</button>
+  <select id="basemapSelect" onchange="switchBasemap()">
+    <option value="osm">Normal Map</option>
+    <option value="eric">Satellite</option>
+  </select>
+</div>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Gesture Handling JS -->
+<script src="https://unpkg.com/leaflet-gesture-handling"></script>
+
+<script>
+let map = L.map('map', {
+  gestureHandling: true
+}).setView([22.9734, 78.6569], 5);
+
+// Define base layers
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: 'Map data © OpenStreetMap contributors'
+}).addTo(map);
+
+const ericSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  maxZoom: 20,
+  attribution: 'Tiles © Esri'
+});
+
+// Variables
+let geoData = {};
+let markers = [];
+let polyline;
+let locationZoomDone = false;
+let currentLocationMarker;
+let locationWatchId = null;
+
+// Load GeoJSON file of Indian stations
+fetch('india_railway_stations.geojson')
+  .then(res => res.json())
+  .then(data => {
+    data.features.forEach(f => {
+      const code = (f.properties.code || "").toUpperCase().trim();
+      geoData[code] = {
+        lat: f.properties.lat,
+        lon: f.properties.long,
+        name: f.properties.name
+      };
+    });
+  });
+
+// Fetch train data and plot
+function fetchAndPlot() {
+  const trainNo = document.getElementById('trainNo').value.trim();
+  const doj = document.getElementById('doj').value.replace(/-/g, "");
+
+  if (!trainNo || !doj) {
+    alert("Enter train number and select date.");
+    return;
+  }
+
+  fetch(`http://0.0.0.0:8080/status.php?trainNo=${trainNo}&doj=${doj}`)
+    .then(res => res.json())
+    .then(data => {
+      clearMap();
+
+      const stations = data.stations || [];
+      const points = [];
+
+      stations.forEach(st => {
+        let code = (st.stationCode || "").toUpperCase();
+        if (code === "CSTM") code = "CSMT"; // Fix typo
+
+        const loc = geoData[code];
+        if (loc) {
+          const marker = L.marker([loc.lat, loc.lon])
+            .bindPopup(`<b>${loc.name} (${code})</b><br>${st.arrivalTime || ''} - ${st.departureTime || ''}`)
+            .addTo(map);
+          markers.push(marker);
+          points.push([loc.lat, loc.lon]);
+        }
+      });
+
+      if (points.length > 0) {
+        polyline = L.polyline(points, { color: 'blue' }).addTo(map);
+        map.fitBounds(polyline.getBounds());
+      } else {
+        alert("No station coordinates found.");
+      }
+    })
+    .catch(err => {
+      console.error("Error fetching train data:", err);
+      alert("Failed to fetch train status.");
+    });
+}
+
+// Clear old map markers and polylines
+function clearMap() {
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
+  if (polyline) map.removeLayer(polyline);
+} 
+
+// Enable live location
+function enableLiveLocation() {
+  if (!navigator.geolocation) {
+    alert("Geolocation not supported.");
+    return;
+  }
+
+  if (locationWatchId) return; // already enabled
+
+  locationWatchId = navigator.geolocation.watchPosition(
+    updateCurrentLocation,
+    err => alert("Location access failed."),
+    {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 1000
+    }
+  );
+}
+
+// Update live location marker
+function updateCurrentLocation(position) {
+  const { latitude, longitude, heading } = position.coords;
+  const angle = heading || 0;
+
+  if (!currentLocationMarker) {
+    currentLocationMarker = L.marker([latitude, longitude], {
+      icon: L.divIcon({
+        html: `<div style="transform: rotate(${angle}deg); font-size: 20px;">➤</div>`,
+        className: '',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      })
+    }).addTo(map);
+  } else {
+    currentLocationMarker.setLatLng([latitude, longitude]);
+    currentLocationMarker.setIcon(L.divIcon({
+      html: `<div style="transform: rotate(${angle}deg); font-size: 20px;">➤</div>`,
+      className: '',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    }));
+  }
+
+  if (!locationZoomDone) {
+    map.setView([latitude, longitude], 17);
+    locationZoomDone = true;
+  }
+}
+
+// Switch between basemaps
+function switchBasemap() {
+  const choice = document.getElementById('basemapSelect').value;
+  if (choice === 'osm') {
+    map.addLayer(osm);
+    map.removeLayer(ericSatellite);
+  } else if (choice === 'eric') {
+    map.addLayer(ericSatellite);
+    map.removeLayer(osm);
+  }
+}
+function toggleMenu() {
+  const menu = document.getElementById("menu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// Close menu on outside click
+document.addEventListener("click", function(event) {
+  const menu = document.getElementById("menu");
+  const dots = document.querySelector(".dots");
+  
+  if (
+    menu.style.display === "block" &&
+    !menu.contains(event.target) &&
+    !dots.contains(event.target)
+  ) {
+    menu.style.display = "none";
+  }
+});
+</script>
+
+</body>
+</html>

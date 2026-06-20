@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1024">
+    <title>PNR Ticket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #e9f3ff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .ticket {
+            width: 90%;
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border: 2px dashed #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            font-size: 45px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .last-updated {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 20px;
+            color: gray;
+            display: flex;
+            align-items: center;
+        }
+
+        .refresh-icon {
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            color: blue;
+        }
+
+        .route-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .station {
+            flex: 1;
+        }
+
+        .station-name {
+            font-size: 40px;
+            font-weight: bold;
+        }
+
+        .short-name {
+            font-size: 30px;
+            color: gray;
+        }
+
+        .train-image {
+            width: 100px;
+            height: auto;
+        }
+
+        .ticket-details {
+            text-align: left;
+            margin-top: 10px;
+            font-size: 40px;
+        }
+
+        .ticket-details p {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .passenger-table {
+            width: %;
+            height: 200%;
+            border-collapse: collapse;
+            min-width: 450px;
+            font-size: 40px;
+        }
+
+        .passenger-table th, .passenger-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .passenger-table th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .passenger-table td {
+            background-color: #f8f9fa;
+        }
+
+        /* Styled button */
+        button {
+            padding: 20px 35px;
+            margin-top: 30px;
+            font-size: 30px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #e9f3ff;
+        }
+        input
+        {
+          padding: 30px 150px;
+          font-size:40px;
+          text-align: center;
+        }
+.topbar {
+  position: relative;
+  background: linear-gradient(90deg, #004e92, #000428);
+  color: white;
+  padding: 15px 10px 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.title-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.moto {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  margin-top: 2px;
+  opacity: 0.8;
+  color: #d0d0ff;
+}
+
+.menu-container {
+  position: absolute;
+  left: 10px;
+  top: 18px;
+}
+
+.dots {
+  font-size: 40px;
+  cursor: pointer;
+  color: white;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background: white;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.dropdown div {
+  padding: 50px 100px;
+  cursor: pointer;
+  
+}
+
+.dropdown div:hover {
+  background-color: #f0f0f0;
+}
+
+    </style>
+</head>
+<body>
+    <div class="topbar">
+  <div class="menu-container">
+    <div class="dots" onclick="toggleMenu()">&#8942;</div>
+    <div class="dropdown" id="menu">
+     
+     <a href="pnr.html"><div>pnr status</div></a>
+      <a href="between.html"><div>train between</div></a>
+      <a href="coach.html"><div> Coach Layout</div></a>
+       <a href="trainstatus.html"><div> Train status</div></a>
+       <a href="availiblity.html">
+         <div> Seat Availibility</div>
+       </a>
+       <div>Settings</div>
+ <div>Help</div>
+ <div>About</div>
+    </div>
+  </div>
+  
+  
+  <div class="title-box">
+    
+    <img src="Designer.jpeg" width="150px" height="150px">
+    <div class="title">TrainMate</div>
+    <div class="moto">Your true mate of journey</div>
+  </div>
+</div>
+</div>
+
+    <h2>Check PNR Status</h2>
+    <input type="text" id="pnrInput" placeholder="Enter PNR" required>
+    <button onclick="fetchPNR()">Check</button>
+
+    <div id="pnrResult"></div>
+
+    <script>
+    function toggleMenu() {
+  const menu = document.getElementById("menu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// Close menu on outside click
+document.addEventListener("click", function(event) {
+  const menu = document.getElementById("menu");
+  const dots = document.querySelector(".dots");
+  
+  if (
+    menu.style.display === "block" &&
+    !menu.contains(event.target) &&
+    !dots.contains(event.target)
+  ) {
+    menu.style.display = "none";
+  }
+});
+        function fetchPNR(pnrFromURL = "") {
+            let pnr = pnrFromURL || document.getElementById("pnrInput").value.trim();
+            
+            if (pnr === "" || pnr.length !== 10) {
+                alert("Please enter a valid 10-digit PNR number.");
+                return;
+            }
+
+            fetch(`http://0.0.0.0:8080/pnr.php?pnr=${pnr}`)
+            .then(response => response.text())
+            .then(data => {
+                let lines = data.split("\n").filter(line => line.trim() !== "");
+
+                let tripName = lines[0] || "N/A";
+                let date = lines[1] || "N/A";
+                let trainNo = lines[2] || "N/A";
+                let trainName = lines[4] || "N/A";
+                let boardingStation = lines[6] || "N/A";
+                let boardingStationShort = lines[8] || "N/A";
+                let boardingTime = lines[10] || "N/A";
+                let journeyTime = lines[15] || "N/A";
+                let destinationDateTime = lines[16] || "N/A";
+                let destinationShort = lines[18] || "N/A";
+                let destinationName = lines[20] || "N/A";
+                let pnrCode = lines[23] || "N/A";
+                let trainClass = lines[25] || "N/A";
+                let lastUpdated = lines[27] || "N/A";
+                let chartStatus = lines[28] || "N/A";
+
+                let ticketHTML = `
+                    <div class="ticket">
+                        <div class="header">
+                            <p>🎫 Ticket</p>
+                            <p>PNR: ${pnrCode}</p>
+                            <p>${trainNo} - ${trainName}</p>
+                            <div class="last-updated">
+                                ${lastUpdated}
+                                <span class="refresh-icon" onclick="reloadPNR('${pnrCode}')">🔄</span>
+                            </div>
+                        </div>
+
+                        <div class="route-section">
+                            <div class="station">
+                                <p class="station-name">${boardingStation}</p>
+                                <p class="short-name">(${boardingStationShort})</p>
+                            </div>
+                            <img src="train.png" alt="Train" class="train-image">
+                            <div class="station">
+                                <p class="station-name">${destinationName}</p>
+                                <p class="short-name">(${destinationShort})</p>
+                            </div>
+                        </div>
+
+                        <div class="ticket-details">
+                            <p><strong>Class:</strong> ${trainClass}</p>
+                            <p><strong>Journey Date:</strong> ${date}</p>
+                            <p><strong>Boarding Time:</strong> ${boardingTime}</p>
+                            <p><strong>Journey Time:</strong> ${journeyTime}</p>
+                            <p><strong>Arrival Date & Time:</strong> ${destinationDateTime}</p>
+                            <p><strong>Chart Status:</strong> ${chartStatus}</p>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="passenger-table">
+                                <tr>
+                                    <th>Passenger</th>
+                                    <th>Booking Status</th>
+                                    <th>Current Status</th>
+                                    <th>Coach/Berth</th>
+                                </tr>`;
+
+                let passengerDetails = [];
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].includes("Booking Status")) {
+                        let bookingStatus = lines[i + 1] ? lines[i + 1] : "N/A";
+                        let currentStatus = lines[i + 3] ? lines[i + 3] : "N/A";
+                        let coachBerth = lines[i + 5] ? lines[i + 5] : "N/A";
+                        passengerDetails.push([bookingStatus, currentStatus, coachBerth]);
+                    }
+                }
+
+                passengerDetails.forEach((details, index) => {
+                    ticketHTML += `<tr>
+                        <td>Passenger ${index + 1}</td>
+                        <td>${details[0]}</td>
+                        <td>${details[1]}</td>
+                        <td>${details[2]}</td>
+                    </tr>`;
+                });
+
+                ticketHTML += `</table></div></div>`;
+                document.getElementById("pnrResult").innerHTML = ticketHTML;
+            })
+            .catch(error => console.error("Error fetching data:", error));
+        }
+
+        function reloadPNR(pnr) {
+            fetchPNR(pnr);
+        }
+    </script>
+
+</body>
+</html>
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PNR Status Information</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+      background-color: #e9f3ff;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    b {
+      color: #2c3e50;
+    }
+    section {
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>PNR Status Guide</h1>
+
+ <p style="text-align: left;">
+  <b>PNR Status Check<br></b>
+  PNR Status tells the latest seat berth status of passenger in Indian Railways i.e. whether passenger has got confirmed reservation, Reservation Against Cancellation (RAC) or the passenger is in waiting list. For waiting list or RAC passengers, PNR status might change to confirmed in future if other passengers on this trip cancel their journey. For passengers who have cancelled their trip, it is shown as Can/Mod. Train PNR status also tells the origin station, boarding point, destination station, travel class, quota and charting status. Once final chart is prepared, the Indian Railway PNR status live freezes and does not change after that.
+</p>
+<p style="text-align: left;">
+  <b>PNR status - Why is it important?<br></b>
+  It is a record in the Indian Railways database that stores the journey details for a passenger or a group of passengers. The Centre for Railway Information Systems (CRIS) also keeps track of information such as passengers' current PNR status, availability of berths in all classes for the next 60 days, and static inquiries such as Train Between Important Stations, Reservations Rules, Fares, Refund, and Rules, and so on.
+</p>
+
+<p style="text-align: left;">
+  The PNR number is typically printed in the upper left corner of printed tickets. The E-Ticket is mentioned at the top in a separate cell. Passengers' personal information, such as name, age, gender, and so on, is saved in the database in conjunction with this reference number. It has columns for storing the booking status and the current status of the ticket.
+</p>
+
+<p style="text-align: left;">
+  Because every train has a limited number of seats, it is possible that you will not receive a confirmed reserved ticket. When there is any availability of reserved seats due to cancellation, the current status of such a waitlist (W/L) ticket changes. PNR live status gives all the details in real-time to help you make informed decisions while booking train tickets online.
+</p>
+ <p align=left>
+<b>Check PNR status online</b><br>
+You can now easily check PNR status in real time by using the Trainman online PNR live status system. Get an instant PNR status update for your train ticket booking online.
+</p>
+<p align=left>
+Enter the 10-digit PNR number found on the top left corner of a train ticket and go to the "PNR Status" button. It will return your train ticket's accurate PNR status as well as waitlist prediction updates.
+</p>
+<p align=left>
+<b>What does a PNR number explain?</b><br>
+PNR number holds various information related to the train journey.
+</p>
+<p align=left>
+Passenger Details - Name, Age, Sex, Birth Preference<br>
+Ticket Details - Train Number, Date of Journey, Origin/Source Station, Destination Station, Boarding Station, Class, Berth, Quota<br>
+Fare, Transaction Type and Payment Details<br>
+First 3 digits tell us from which Passenger Reservation System or PRS the ticket has been booked.<br>
+First digit depends on the Zone of the Train, w.r.t. starting station of the train.<br>
+Zonal Codes - 1 (SCR Secunderabad PRS);<br> 2, 3 (NR, NCR, NWR, NER New Delhi PRS); <br>4, 5 (SR, SWR, SCR Chennai PRS);<br> 6, 7 (NFR, ECR, ER, ECoR, SER, SECR Calcutta PRS); <br>8, 9 (CR, WCR, WR Mumbai PRS)<br>
+Last seven digits are randomly generated numbers using the Rand() function. These numbers represent no information about the ticket or journey as such. They only provide an unique identity to the PNR number.</p>
+<p align=left><b>When to check PNR status?</b><br>
+It is important to check your PNR status after train ticket booking online. Your PNR status will tell you whether the ticket has been confirmed, on waiting list (WL) or is under reservation against cancellation (RAC). It provides details of the coach and seat number, class of travel, chart status, train name, train number, booking status, current status, journey time and fare apart from the basic information about arrival and departure time of trains.</p>
+<p align=center><b>
+How many days can we check PNR status?</b>
+The validity of the PNR expires when the journey is completed. Once the train arrives at the destination station, the PNR becomes meaningless, and no further journeys with the same PNR are possible. However, the PNR number is stored for nine months in the database of Indian Railways (CRIS)</p>
+
+ 
+
+  <section>
+    <h2><b>How to check PNR status with passenger name?</b></h2>
+    <p>To put it simply, it is not possible to know live PNR status online with a passenger name. One can simply take the 10-digit code and go to Trainman PNR status to check their PNR status online. Additionally, we tell, with 95% accuracy, if you have confirmed train tickets online or not.</p>
+  </section>
+
+  <section>
+    <h2><b>How to check PNR status with SMS?</b></h2>
+    <p>Along with checking your PNR status online through the Trainman app, you can also check PNR status online through mobile SMS.</p>
+    <p><b>PNR status checks for railway reservation using SMS/phone:</b> SMS PNR and send to "139"</p>
+    <p><b>Format:</b> PNR 10-digit-PNR-Number or call 139 and follow the steps.</p>
+    <p><b>PNR Status Enquiry at railway station counters</b></p>
+    <p>Final reservation charts (made live 1 hour before the train departure)</p>
+    <p><b>Here's an example:</b></p>
+    <ul>
+      <li><b>SMS Number:</b> 139</li>
+      <li><b>Text Message:</b> PNR 10-Digit-PNR-Number</li>
+      <li><b>Example:</b> PNR 1234567890</li>
+      <li><b>Explanation:</b> Send SMS to number 139 with text as PNR 1234567890</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><b>Will my PNR be confirmed?</b></h2>
+    <p>Because there are only a limited number of seats available on a train, it is not possible to provide a confirmed train ticket online for every booking. When tickets are available, the train ticket booking system displays CNF (Confirmed) and RAC (Reservation Against Cancellation) status, and subsequent bookings display waitlisted status. Only if a CNF/RAC ticket is cancelled will waitlisted tickets be confirmed in order.</p>
+    <p>Tracking Indian Railway PNR status live is especially important if you have a waitlisted ticket. Other travel information such as coach number, berth number, and berth type are only provided if the booked ticket status is Confirmed (CNF).</p>
+  </section>
+
+  <section>
+    <h2><b>PNR Status Prediction Analysis</b></h2>
+    <p>When you book train tickets online, you may or may not receive a confirmed ticket status. You may also receive a wait list or RAC ticket. Aside from checking the train PNR status on a regular basis, a new feature called Trainman's PNR prediction informs you of the likelihood of ticket confirmation.</p>
+    <p>It has been found to be 95 percent accurate the majority of the time, and it is supported by data analysis. Using this feature on the Trainman website and the Android app, you can estimate whether or not your wait list or RAC ticket will be confirmed.</p>
+    <p>Trainman PNR prediction assists you in predicting your chances of receiving confirmed tickets. Predictions are made using data analytics and machine learning techniques and are based on a variety of factors such as previous booking and cancellation trends, station quotas, days of the week, seasonality, holidays, and so on.</p>
+    <p>Generally, waiting list PNR Status has very few chances of being confirmed during peak seasons such as Durga Puja (Dussehra), Diwali, Chhath, Holi, and so on.</p>
+  </section>
+
+  <section>
+    <h2><b>Types of PNR Status</b></h2>
+    <ul>
+      <li><b>CNF</b> - 'Confirmed' ticket.</li>
+      <li><b>RAC</b> - 'Reservation Against Cancellation' (You can board the train).</li>
+      <li><b>WL</b> - 'Waiting List' (You can only board if it gets confirmed).</li>
+      <li><b>GNWL</b> - General Waitlist.</li>
+      <li><b>TQWL</b> - Tatkal Waitlist.</li>
+      <li><b>PQWL</b> - Pooled Quota Waitlist.</li>
+      <li><b>RLWL</b> - Remote Location Waitlist.</li>
+      <li><b>NOSB</b> - No Seat Berth.</li>
+      <li><b>CAN</b> - Ticket Cancelled.</li>
+    </ul>
+    <p>The 10-digit PNR number can tell you all about your reservation status. This can further enhance your understanding and let you book dorms and meals on trains accordingly.</p>
+  </section>
+
+  <section>
+    <h2><b>PNR Status Confirmation Of Waitlist Tickets</b></h2>
+    <ul>
+      <li><b>GNWL</b> - Highest confirmation chances</li>
+      <li><b>TQWL</b> - Lower confirmation chances than GNWL</li>
+      <li><b>RLWL</b> - Less chances of confirmation</li>
+      <li><b>PQWL</b> - Less chances of confirmation</li>
+      <li><b>RLGN</b> - Less chances of confirmation under RLWL</li>
+      <li><b>RQWL</b> - Less chances of confirmation</li>
+      <li><b>RSWL</b> - Less chances of confirmation</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><b>PNR Status Enquiry Quick Facts</b></h2>
+    <ul>
+      <li><b>What is PNR in an e-ticket?</b> - Passenger Name Record</li>
+      <li><b>Length of PNR no.:</b> 10 Digits (Only Numeric form)</li>
+      <li><b>Meaning of first 3 digits:</b> PRS (Passenger Reservation System)</li>
+      <li><b>Meaning of last 7 digits:</b> Randomly generated by the system</li>
+      <li><b>Validity period of PNR:</b> 9 months</li>
+    </ul>
+  </section>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .faq-item {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .faq-question {
+      font-weight: bold;
+      cursor: pointer;
+      padding: 10px;
+      background-color: lightblue;
+      border-radius: 5px;
+    }
+
+    .faq-answer {
+      display: none;
+      padding: 10px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Frequently Asked Questions</h2>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">1. Where can I find the PNR number on my ticket?</div>
+  <div class="faq-answer">The PNR number is printed on the top left corner of physical tickets and at the top of e-tickets. It's a unique 10-digit number used to check your booking status.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">2. Is PNR number allotted to unreserved tickets?</div>
+  <div class="faq-answer">No, PNR numbers are only issued for reserved tickets. Unreserved tickets are not linked to a specific seat or berth, hence no PNR is generated.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">3. How is a PNR number generated?</div>
+  <div class="faq-answer">A PNR is generated using a combination of PRS zone code and 7 random digits. It is assigned when a booking is made and is unique for every reservation.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">4. How can I check PNR status live?</div>
+  <div class="faq-answer">You can check live PNR status online via platforms like Trainman, IRCTC, or NTES. Just enter your 10-digit PNR number to view the current status and seat confirmation.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">5. Do I need to carry any other documents with a valid ticket?</div>
+  <div class="faq-answer">Yes, along with a valid ticket, you must carry a government-issued photo ID such as Aadhaar, PAN, or Voter ID for verification during travel.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">6. PNR and Train Charting</div>
+  <div class="faq-answer">PNR status gets finalized once train charting is done. After chart preparation, no further changes in seat status occur, and the final allotment is reflected in the PNR.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">7. How are PNR status and train charting related?</div>
+  <div class="faq-answer">Train charting is the process where final seat allocation is done. PNR status becomes fixed once the chart is prepared, usually a few hours before departure.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">8. Is there an app to check PNR live status on mobile?</div>
+  <div class="faq-answer">Yes, apps like our site, IRCTC Rail Connect, and NTES allow you to check PNR status, train schedules, and seat availability directly from your smartphone.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">9. My booking shows WL but current status is CNF. Is it confirmed?</div>
+  <div class="faq-answer">Yes, CNF means your ticket is confirmed. Though initially waitlisted, it got upgraded due to cancellations or availability during charting.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">10. My current status is RAC/20/GN. What does this mean?</div>
+  <div class="faq-answer">RAC means Reservation Against Cancellation. You are allowed to board and will get a seat to sit, but not a full berth until it’s upgraded.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">11. Status of my train ticket PNR enquiry is CNF/B1/16/NC. Does that mean my ticket is confirmed or not?</div>
+  <div class="faq-answer">Yes, CNF means your ticket is confirmed. B1 is the coach number, 16 is your seat number, and NC indicates No Choice for berth preference.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">12. PNR status check for railway ticket is showing the current status as PQWL/5. Will it confirm or not? What should I do?</div>
+  <div class="faq-answer">PQWL means Pooled Quota Waiting List. It depends on cancellations in the pooled quota. It might get confirmed but is less likely than GNWL.</div>
+</div>
+
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">13. Does checking PNR status let me know the passenger name, age or gender?</div>
+  <div class="faq-answer">No, passenger details like name, age, and gender are not shown publicly for privacy reasons while checking PNR status online.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">14. Are these PNR numbers ever reused?</div>
+  <div class="faq-answer">No, each PNR is unique for a journey and is not reused. However, old PNRs are removed from the database after around 9 months.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">15. What happens if my railway PNR remains waitlisted after chart preparation?</div>
+  <div class="faq-answer">If your ticket remains waitlisted even after charting, you cannot board the train and the ticket is automatically canceled with refund (for e-ticket).</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">16. I have lost my train ticket but I remember my PNR number. Can I still travel?</div>
+  <div class="faq-answer">Yes, if you booked online (e-ticket), you can show the ticket on mobile with a valid ID. For paper tickets, you may need to visit the reservation office.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">17. I booked a ticket in sleeper (SL) class but my ticket has been upgraded to third ac (3A). Can class get upgraded for any railway PNR?</div>
+  <div class="faq-answer">Yes, Indian Railways may upgrade tickets to higher classes based on availability under the auto-upgrade scheme, at no extra cost.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-question" onclick="toggleAnswer(this)">18. Live PNR status is showing that the train is cancelled. How can a train get cancelled? Will I be getting refund?</div>
+  <div class="faq-answer">Trains can be cancelled due to weather, maintenance, or operational issues. For canceled trains, a full refund is processed automatically if ticket was booked online.</div>
+</div>
+
+<script>
+  function toggleAnswer(el) {
+    const answer = el.nextElementSibling;
+    answer.style.display = answer.style.display === "block" ? "none" : "block";
+  }
+</script>
+
+<style>
+  .faq-answer {
+    display: none;
+    padding: 8px 12px;
+    background: #f9f9f9;
+    border-left: 3px solid #007bff;
+    margin-top: 5px;
+    border-radius: 4px;
+  }
+</style>

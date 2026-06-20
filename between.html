@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Train Availability</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #e9f3ff;
+      color: #003366;
+      font-size: 30px;
+      
+    }
+    h2 {
+      text-align: center;
+      color: #00336;
+    }
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input, button {
+      padding: 60px;
+      border: 1px solid #007bff;
+      border-radius: 5px;
+      font-size: 40px;
+      margin: 31px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .swap-btn {
+      background: #0056b3;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      padding: 30px 45px;
+      font-weight: bold;
+      cursor: pointer;
+      
+    }
+    .train-card {
+      font-size: 50px;
+      background: white;
+      padding: 10px;
+      margin: 15px 0;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    .train-card:hover {
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    .class-scroll {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .class-box {
+      min-width: 160px;
+      padding: 10px;
+      background: #f0f8ff;
+      border-radius: 8px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .more-info {
+      margin-top: 10px;
+      display: none;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px dashed #007bff;
+    }
+    .running-days {
+      font-size: 40px;
+      margin-top: 5px;
+      letter-spacing: 2px;
+      color: #007bff;
+    }
+    .train-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .train-actions a {
+      padding: 40px 100px;
+      border-radius: 6px;
+      text-decoration: none;
+      background: #007bff;
+      color: white;
+      font-size: 20px;
+    }
+    .train-actions a:hover {
+      background: #0056b3;
+    }
+    
+ .input-wrapper {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  z-index: 999;
+  max-height: 150px;
+  overflow-y: auto;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.suggestions div {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestions div:hover {
+  background-color: #f2f2f2;
+}
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;600&display=swap');
+
+.topbar {
+  position: relative;
+  background: linear-gradient(90deg, #004e92, #000428);
+  color: white;
+  padding: 15px 10px 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.title-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-family: 'Orbitron', sans-serif;
+  
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.moto {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  margin-top: 2px;
+  opacity: 0.8;
+  color: #d0d0ff;
+}
+
+.menu-container {
+  position: absolute;
+  left: 10px;
+  top: 18px;
+}
+
+.dots {
+  font-size: 50px;
+  cursor: pointer;
+  color: white;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background: white;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.dropdown div {
+  padding: 50px 100px;
+  cursor: pointer;
+  
+}
+
+.dropdown div:hover {
+  background-color: #f0f0f0;
+}
+
+  </style>
+</head>
+<body>
+  <div class="topbar">
+  <div class="menu-container">
+    <div class="dots" onclick="toggleMenu()">&#8942;</div>
+    <div class="dropdown" id="menu">
+     
+     <a href="pnr.html"><div>pnr status</div></a>
+      <a href="between.html"><div>train between</div></a>
+      <a href="coach.html"><div> Coach Layout</div></a>
+       <a href="trainstatus.html"><div> Train status</div></a>
+       <a href="availiblity.html">
+         <div> Seat Availibility</div>
+       </a>
+       <div>Settings</div>
+ <div>Help</div>
+ <div>About</div>
+    </div>
+  </div>
+  
+  <img src="Designer.jpeg" width="150px" height="150px">
+  <div class="title-box">
+    
+    
+    <div class="title"><h1>TrainMate</h1></div>
+    <div class="moto"><h2>Your true mate of journey</h2></div>
+  </div>
+</div>
+
+  <h1>Train Availability Checker</h1>
+<form id="searchForm">
+  
+  <div class="input-wrapper">
+    <input type="text" id="from" placeholder="From (e.g. NDLS)" required autocomplete="off">
+    <div class="suggestions" id="from-suggest"></div>
+  </div>
+  
+  <!-- Swap button -->
+  <button type="button" class="swap-btn" onclick="swapStations()">⇅</button>
+  
+  <div class="input-wrapper">
+    <input type="text" id="to" placeholder="To (e.g. MMCT)" required autocomplete="off">
+    <div class="suggestions" id="to-suggest"></div>
+  </div>
+  
+  <input type="date" id="date" required>
+  <button type="submit">Search</button>
+  
+</form>
+
+  <div id="result"></div>
+<script>
+function toggleMenu() {
+  const menu = document.getElementById("menu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// Close menu on outside click
+document.addEventListener("click", function(event) {
+  const menu = document.getElementById("menu");
+  const dots = document.querySelector(".dots");
+  
+  if (
+    menu.style.display === "block" &&
+    !menu.contains(event.target) &&
+    !dots.contains(event.target)
+  ) {
+    menu.style.display = "none";
+  }
+});
+  function fetchSuggestions(inputId, suggestId) {
+    const input = document.getElementById(inputId);
+    const suggestBox = document.getElementById(suggestId);
+    
+    input.addEventListener('input', async () => {
+      const query = input.value.trim();
+      if (query.length < 2) {
+        suggestBox.innerHTML = "";
+        return;
+      }
+      
+      try {
+        const res = await fetch(`http://0.0.0.0:8080/station-suggestion.php?q=${encodeURIComponent(query)}`);
+        const json = await res.json();
+        const data = json.items || [];
+        
+        suggestBox.innerHTML = "";
+        
+        data.forEach(item => {
+          const div = document.createElement('div');
+          div.textContent = `${item.station_name} (${item.station_code})`;
+          div.style.padding = "5px";
+          div.style.cursor = "pointer";
+          div.addEventListener('click', () => {
+            input.value = item.station_code;
+            suggestBox.innerHTML = "";
+          });
+          suggestBox.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Error fetching suggestions:", err);
+        suggestBox.innerHTML = "<div style='color:red;'>Error fetching suggestions</div>";
+      }
+    });
+    
+    // Hide suggestions if clicked outside
+    document.addEventListener('click', e => {
+      if (!suggestBox.contains(e.target) && e.target !== input) {
+        suggestBox.innerHTML = "";
+      }
+    });
+  }
+  
+  // Call for both input boxes
+  fetchSuggestions('from', 'from-suggest');
+  fetchSuggestions('to', 'to-suggest');
+</script>
+<script>
+  const form = document.getElementById('searchForm');
+  const result = document.getElementById('result');
+  const dayMap = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  
+  function swapStations() {
+    const from = document.getElementById('from');
+    const to = document.getElementById('to');
+    [from.value, to.value] = [to.value, from.value];
+  }
+  
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    result.innerHTML = "Loading...";
+    const from = document.getElementById('from').value;
+    const to = document.getElementById('to').value;
+    const date = document.getElementById('date').value.split('-').reverse().join('-');
+    
+    const res = await fetch(`http://localhost:8080/between.php?from=${from}&to=${to}&date=${date}`);
+    const data = await res.json();
+    
+    const trains = data.data?.trainList || [];
+    const nearbyTrains = data.data?.nearbyTrains || [];
+    
+    result.innerHTML = "";
+    
+    if (trains.length > 0) {
+      renderTrainList(trains);
+    } else if (data.data?.errorCode === 531 && nearbyTrains.length > 0) {
+      result.innerHTML += `<div style="color:orange; font-weight:bold; padding:10px;">No direct trains found. Showing alternate options:</div>`;
+      renderTrainList(nearbyTrains);
+    } else {
+      result.innerHTML = "No direct trains  found or  error.";
+    }
+  });
+  
+  function renderTrainList(trainArray) {
+    trainArray.forEach(train => {
+      const div = document.createElement('div');
+      div.className = "train-card";
+      
+      const days = train.runningDays?.split('')?.map((d, i) => {
+        return `<b style="color: ${d === '1' ? '#007bff' : '#ccc'}">${dayMap[i]}</b>`;
+      }).join(' ') || 'Unknown';
+      
+      let inner = `
+        <h3>${train.trainNumber} - ${train.trainName}</h3>
+        <p><strong>${train.fromStnName}</strong> (${train.departureTime}) → <strong>${train.toStnName}</strong> (${train.arrivalTime})</p>
+        <div class="running-days">Runs on: ${days}</div>
+        <div class="class-scroll">
+      `;
+      
+      (train.avlClassesSorted || []).forEach(cls => {
+        const baseCls = cls.split('_')[0];
+        const quota = cls.includes('_TQ') ? 'TQ' : 'GN';
+        const cache = quota === 'TQ' ? train.availabilityCacheTatkal?.[baseCls] : train.availabilityCache?.[baseCls];
+        
+        if (cache) {
+          const status = cache.availabilityDisplayName || '-';
+          const chance = cache.predictionDisplayName || '';
+          const fare = cache.fare || '—';
+          
+          let mainColor = '#ccc';
+          let bgColor = '#f0f0f0';
+          const chanceText = (status + ' ' + chance).toLowerCase();
+          
+          if (chanceText.includes('cancelled') || chanceText.includes('departed') || chanceText.includes('chart')) {
+            mainColor = '#007BFF';
+            bgColor = '#e6f0ff';
+          } else if (chanceText.includes('not available') || chanceText.includes('regret') || chanceText.includes('no chance') || (chance && parseInt(chance.replace('%', '')) < 25)) {
+            mainColor = '#dc3545';
+            bgColor = '#ffe6e6';
+          } else if (chanceText.includes('available') || chanceText.includes('confirmed') || (chance && parseInt(chance.replace('%', '')) > 75)) {
+            mainColor = '#28a745';
+            bgColor = '#e6ffea';
+          } else {
+            mainColor = '#ffc107';
+            bgColor = '#fff8e1';
+          }
+          
+          inner += `
+            <div class="class-box" style="border-left: 5px solid ${mainColor}; background-color: ${bgColor};">
+              <strong>${baseCls} (${quota})</strong><br>
+              ${status}<br>
+              <span style="color:${mainColor}; font-weight:bold;">${chance}</span><br>
+              ₹${fare}
+            </div>
+          `;
+        }
+      });
+      
+      inner += `</div>
+        <div class="train-actions">
+          <a href="trainstatus.html?train_no=${train.trainNumber}" target="_blank">Train Status</a>
+          <a href="https://www.irctc.co.in/nget/train-search" target="_blank">Book Ticket</a>
+          <a href="availability.html?train_no=${train.trainNumber}" target="_blank">Availability</a>
+        </div>
+        <div class="more-info">
+          <p><strong>Train Type:</strong> ${train.trainType || '—'}</p>
+          <p><strong>Rating:</strong> ${train.trainRating || '—'}/5</p>
+          <p><strong>Distance:</strong> ${train.distance || '—'} km</p>
+          <p><strong>Pantry:</strong> ${train.hasPantry ? 'Yes' : 'No'}</p>
+          <p><strong>From:</strong> ${train.trainOriginStationName} → <strong>To:</strong> ${train.trainDestinationStationName}</p>
+        </div>
+      `;
+      
+      div.innerHTML = inner;
+      div.addEventListener('click', () => {
+        const extra = div.querySelector('.more-info');
+        extra.style.display = extra.style.display === 'block' ? 'none' : 'block';
+      });
+      
+      result.appendChild(div);
+    });
+  }
+</script>
+
+</body>
+</html>
